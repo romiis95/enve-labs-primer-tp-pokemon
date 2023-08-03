@@ -161,19 +161,30 @@ const pikachu = {
   
     return attackedResistances.includes(attackerType);
   }
-  
   function addAbility(pokemon, abilityData) {
     const abilityType = Object.keys(abilityData)[0];
     const abilityName = abilityData[abilityType];
+  
+    if (abilityType === "primary" || abilityType === "hidden") {
+      if (!pokemon.ability[abilityType]) {
+        pokemon.ability[abilityType] = abilityName;
+      } else {
+        console.log(`El Pokémon ya tiene una habilidad ${abilityType}`);
+      }
+    } else {
+      console.log(`Tipo de habilidad no válido: ${abilityType}`);
+    }
+  
+    return pokemon;
   }
-
   const abilityData = {
     secondary: "Discharge"
   };
-
-const pikachuWithAbility = addAbility(pikachu, abilityData);
-console.log("Pikachu con nueva habilidad:", pikachuWithAbility);
-    
+  
+  const pikachuWithAbility = addAbility(pikachu, abilityData);
+  console.log("Pikachu con nueva habilidad:", pikachuWithAbility);
+  
+  
 function addMove(pokemon, move) {
     return {
       ...pokemon,
@@ -220,9 +231,13 @@ function addMove(pokemon, move) {
 
 function getAttackLog(attackData) {
     const { attacker, attacked, move, damage } = attackData;
+    console.log(attacker);
+    console.log(attacked);
+    console.log(move);
+    console.log(damage);
     return `${attacker} used ${move}! ${attacked} lost ${damage} HP!`;
-  }
-  
+}
+
   const attackLog = getAttackLog(attackData);
   console.log(attackLog);
 
@@ -255,54 +270,54 @@ function bettle(pokemon1, pokemon2) {
 
 
 function battle(pokemon1, pokemon2) {
-    let rounds = 0;
-    const history = [];
-  
-    while (pokemon1.stats.hp > 0 && pokemon2.stats.hp > 0) {
-      const attackingPokemon = pokemon1.stats.speed >= pokemon2.stats.speed ? pokemon1 : pokemon2;
-      const attackedPokemon = attackingPokemon === pokemon1 ? pokemon2 : pokemon1;
-  
-      const move = getRandomMove(attackingPokemon);
-      const damage = calculateDamage(attackingPokemon, attackedPokemon);
-      attackedPokemon.stats.hp = Math.max(attackedPokemon.stats.hp - damage, 0);
-  
-      const attackLog = getAttackLog({
-        attacker: attackingPokemon.name,
-        attacked: attackedPokemon.name,
-        move: move,
-        damage: damage,
-        modifier: damage > calculateDamage(attackingPokemon, attackedPokemon) ? "weak" : "resistant"
-      });
-  
-      history.push(attackLog);
-      rounds++;
-  
-      if (attackedPokemon.stats.hp <= 0) {
-        break; 
-      }
-    }
-  
-    const winner = pokemon1.stats.hp > 0 ? pokemon1 : pokemon2;
-    const loser = pokemon1.stats.hp > 0 ? pokemon2 : pokemon1;
-  
-    return {
-      rounds: rounds,
-      results: {
-        winner: {
-          name: winner.name,
-          hp: winner.stats.hp
-        },
-        loser: {
-          name: loser.name,
-          hp: loser.stats.hp
-        }
+  let rounds = 0;
+  const history = [];
+
+  const attackingPokemon = { ...pokemon1 };
+  const attackedPokemon = { ...pokemon2 };
+
+  while (attackingPokemon.stats.hp > 0 && attackedPokemon.stats.hp > 0) {
+    const move = getRandomMove(attackingPokemon);
+    const damage = calculateDamage(attackingPokemon, attackedPokemon);
+    attackedPokemon.stats.hp = Math.max(attackedPokemon.stats.hp - damage, 0);
+
+    const attackLog = getAttackLog({
+      attacker: attackingPokemon.name,
+      attacked: attackedPokemon.name,
+      move: move,
+      damage: damage,
+      modifier: damage > calculateDamage(attackingPokemon, attackedPokemon) ? "weak" : "resistant"
+    });
+
+    history.push(attackLog);
+    rounds++;
+    const temp = attackingPokemon;
+    attackingPokemon - attackedPokemon;
+    attackedPokemon - temp;
+  }
+
+  const winner = pokemon1.stats.hp > 0 ? pokemon1 : pokemon2;
+  const loser = pokemon1.stats.hp > 0 ? pokemon2 : pokemon1;
+
+  return {
+    rounds: rounds,
+    results: {
+      winner: {
+        name: winner.name,
+        hp: winner.stats.hp
       },
-      history: history
-    };
+      loser: {
+        name: loser.name,
+        hp: loser.stats.hp
+      }
+    },
+    history: history
+  };
 }
-  const battleResult = battle(pikachu, squirtle);
-  console.log(battleResult);
-  
+
+const battleResult = battle(pikachu, squirtle);
+console.log(battleResult);
+
   
       
       
