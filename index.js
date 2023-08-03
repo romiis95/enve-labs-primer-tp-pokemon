@@ -183,8 +183,107 @@ const flamethrowerMove = {
   
   console.log("¿Squirtle es débil frente a Pikachu?", isWeakAgainst(attackData));
   
+  function isStrongAgainst(attackData) {
+    const attackerType = attackData.attacker.type;
+    const attackedWeaknesses = attackData.attacked.modifiers.weakness;
   
+    return attackedWeaknesses.includes(attackerType);
+  }
   
+  function addAbility(pokemon, abilityData) {
+    const abilityType = Object.keys(abilityData)[0];
+    const abilityName = abilityData[abilityType];
+    return {
+        ...pokemon,
+        ability:{
+            ...pokemon.ability,
+        }
+    };
+  }
+  const abilityData = {
+    secondary: "discharge"
+  };
+  const pikachuWithAbility = addAbility(pikachu, abilityData);
+  console.log("picachu con nueva habilidad:", pikachuWithAbility);
+
+  function addMove(pokemon, move) {
+    return {
+        ...pokemon,
+        moves: [...pokemon.moves, move]
+    };
+  }
+  const newMove = "discharge";
+  const pikachuWithMove = addMove(pikachu, newMove);
+  console.log("Picachu con nuevo movimiento:", pikachuWithMove);
+
+
+function removeMove(pokemon, move) {
+    const pokemonCopy = {...pokemon}
+    const indexToRemove= pokemonCopy.moves.indexOf(move);
+
+    if (indexToRemove !== -1){
+        pokemonCopy.moves.splice(indexToRemove,1);
+    }
+    return pokemonCopy;
+} 
+
+const moveToRemove = "Iron Tail";
+const pikachuWithoutMove = removeMove(pikachu, moveToRemove);
+
+console.log("pikachu sin el movimiento 'Iron Tail':", pikachuWithMove);
+console.log("pikachu original:", pikachu);
+
+
+function getAttackModifier(attackData) {
+    const attackerType = attackData.attacker.type;
+    const attackedWeaknesses = attackData.attacked.modifiers.weakness;
+    const attackedResistances = attackData.attacked.modifiers.resistances;
   
+    if (attackedWeaknesses.includes(attackerType)) {
+      return 2;
+    } else if (attackedResistances.includes(attackerType)) {
+      return 0.5;
+    } else {
+      return 1;
+    }
+  }
   
+  // Ejemplo de uso con los objetos pikachu y squirtle:
+  
+  const attackModifier = getAttackModifier(attackData);
+  console.log("Modificador de ataque:", attackModifier);
+  
+
+  // Función para obtener el log del ataque
+function obtenerRegistroAtaque(datosAtaque) {
+    const { attacker, attacked, move, dano, modifier} = datosAtaque;
+    let log = `${attacker} usó ${move}! ${attacked} perdió ${dano} puntos de vida.`;
+  
+    if (modifier === "debil") {
+      log += " ¡Es super efectivo!";
+    } else if (modifier === "resistant") {
+      log += " ¡No es muy efectivo!";
+    }
+  
+    return log;
+  }
+
+  const attackData1 = {
+    atacante: "Squirtle",
+    atacado: "Pikachu",
+    movimiento: "Pistola de Agua",
+    dano: 12,
+    modificador: "debil"
+  };
+  
+  const attackData2 = {
+    atacante: "Pikachu",
+    atacado: "Squirtle",
+    movimiento: "Rayo",
+    dano: 24,
+    modificador: "resistente"
+  };
+  
+  console.log(obtenerRegistroAtaque(attackData1)); // "Squirtle usó Pistola de Agua! Pikachu perdió 12 puntos de vida. ¡Es super efectivo!"
+  console.log(obtenerRegistroAtaque(attackData2)); // "Pikachu usó Rayo! Squirtle perdió 24 puntos de vida. ¡No es muy efectivo!"
   
